@@ -1,5 +1,6 @@
 {
     "appconfig": {
+        "duplicado": true,
         "headless": false,
         "isGroupReply":false,
         "webhook":"",

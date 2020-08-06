@@ -89,20 +89,30 @@ async function processMessages(data) {
     for (let i = 0; i < data.length; i++) {
         //fetch API to send and receive response from server
         let message = data[i];
+        const isReplyToMedia = message.quotedMsgObj && message.quotedMsgObj.fromMe && message.quotedMsgObj.isMedia || false;
+        if (intents.appconfig.duplicado && !isReplyToMedia && !message.body.startsWith('/duplicado ') && !(message.mimetype === 'image/jpeg' || message.mimetype === 'video/mp4' && !message.isGif)) {
+            continue;
+        }
+        const { groupMetadata } = message.chat;
         body = {};
         body.text = message.body;
-        body.type = 'message';
-        body.user = message.chatId._serialized;
+        body.chat = message.chatId._serialized;
+        body.user = message.sender.id.user;
+        body.isReplyToMedia = isReplyToMedia;
+        body.participants = groupMetadata && groupMetadata.participants.map((p) => p.id.user) || [];
+        if (message.mediaKey) {
+            body.media = {
+                key: message.mediaKey,
+                mimeType: message.mimetype,
+                url: message.deprecatedMms3Url
+            };
+        }
         //body.original = message;
         if (intents.appconfig.downloadMedia) {
             downloadFile(message)
         }
         if (intents.appconfig.webhook) {
-            //if message is image then download it first and then call an webhook
-            if (message.type == "image") {
-                body.base64DataFile = await downloadFile(message)
-            }
-            fetch(intents.appconfig.webhook, {
+            fetch(`${intents.appconfig.webhook}/message`, {
                 method: "POST",
                 body: JSON.stringify(body),
                 headers: {
@@ -115,12 +125,13 @@ async function processMessages(data) {
                 //replying to the user based on response
                 if (response && response.length > 0) {
                     response.forEach(itemResponse => {
-                        itemResponse.text = itemResponse.text.fillVariables({ name: message.sender.pushname, phoneNumber: message.sender.id.user, greetings: greetings() });
-                        WAPI.sendMessage2(message.chatId._serialized, itemResponse.text);
-                        //sending files if there is any 
+                        if (itemResponse.text) {
+                            WAPI.sendMessage(message.chatId._serialized, itemResponse.text);
+                        }
+                        //sending files if there is any
                         if (itemResponse.files && itemResponse.files.length > 0) {
                             itemResponse.files.forEach((itemFile) => {
-                                WAPI.sendImage(itemFile.file, message.chatId._serialized, itemFile.name);
+                                WAPI.sendImage(itemFile.file, message.chatId._serialized, itemFile.name, itemFile.caption);
                             })
                         }
                     });
@@ -128,6 +139,9 @@ async function processMessages(data) {
             }).catch(function (error) {
                 console.log(error);
             });
+        }
+        if (intents.appconfig.duplicado) {
+            return;
         }
         window.log(`Message from ${message.chatId.user} checking..`);
         if (intents.blocked.indexOf(message.chatId.user) >= 0) {
@@ -180,6 +194,86 @@ WAPI.waitNewMessages(false, async (data) => {
     console.log(data)
     processMessages(data)
 });
+
+if (intents.appconfig.websocket) {
+    const reconnectDelay = 5000;
+
+    const connect = () => {
+        try {
+            const socket = new WebSocket(intents.appconfig.websocket);
+
+            socket.addEventListener('close', ({ code, reason }) => {
+                console.log('socket close', { code, reason });
+
+                setTimeout(connect, reconnectDelay);
+            });
+
+            socket.addEventListener('error', () => {
+                console.warn('socket error');
+            });
+
+            socket.addEventListener('message', ({ data }) => {
+                data = JSON.parse(data);
+
+                console.log('socket message', { data });
+
+                if (data && data.length > 0) {
+                    data.forEach(item => {
+                        if (item.text) {
+                            WAPI.sendMessage(item.chat, item.text);
+                        }
+                        //sending files if there is any
+                        if (item.files && item.files.length > 0) {
+                            item.files.forEach((itemFile) => {
+                                WAPI.sendImage(itemFile.file, itemFile.chat, itemFile.name, itemFile.caption);
+                            })
+                        }
+                    });
+                }
+            });
+
+            socket.addEventListener('open', () => {
+              console.log('socket open');
+            });
+          } catch (error) {
+            setTimeout(connect, reconnectDelay);
+          }
+    };
+
+    connect();
+}
+
+if (intents.appconfig.webhook) {
+    WAPI.onAddedToGroup((data) => {
+        const id = data.groupMetadata.id._serialized;
+        fetch(`${intents.appconfig.webhook}/new_group`, {
+            method: "POST",
+            body: JSON.stringify({
+                id
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((resp) => resp.json()).then(function (response) {
+            if (response && response.length > 0) {
+                response.forEach(itemResponse => {
+                    if (itemResponse.text) {
+                        WAPI.sendMessage(id, itemResponse.text);
+                    }
+                    //sending files if there is any
+                    if (itemResponse.files && itemResponse.files.length > 0) {
+                        itemResponse.files.forEach((itemFile) => {
+                            WAPI.sendImage(itemFile.file, id, itemFile.name, itemFile.caption);
+                        })
+                    }
+                });
+            }
+        }).catch(function (error) {
+            console.log(error);
+        });
+    });
+}
+
 WAPI.addOptions = function () {
     var suggestions = "";
     intents.smartreply.suggestions.map((item) => {

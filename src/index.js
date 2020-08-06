@@ -44,24 +44,24 @@ async function Main() {
     }
 
     /**
-     * If local chrome is not there then this function will download it first. then use it for automation. 
+     * If local chrome is not there then this function will download it first. then use it for automation.
      */
     async function downloadAndStartThings() {
         let botjson = utils.externalInjection("bot.json");
         var appconfig = await utils.externalInjection("bot.json");
         appconfig = JSON.parse(appconfig);
         spinner.start("Downloading chrome\n");
-        const browserFetcher = puppeteer.createBrowserFetcher({
-            path: process.cwd()
-        });
+        //const browserFetcher = puppeteer.createBrowserFetcher({
+        //    path: process.cwd()
+        //});
         const progressBar = new _cliProgress.Bar({}, _cliProgress.Presets.shades_grey);
         progressBar.start(100, 0);
         var revNumber = await rev.getRevNumber();
-        const revisionInfo = await browserFetcher.download(revNumber, (download, total) => {
+        //const revisionInfo = await browserFetcher.download(revNumber, (download, total) => {
             //console.log(download);
-            var percentage = (download * 100) / total;
-            progressBar.update(percentage);
-        });
+            //var percentage = (download * 100) / total;
+            //progressBar.update(percentage);
+        //});
         progressBar.update(100);
         spinner.stop("Downloading chrome ... done!");
         //console.log(revisionInfo.executablePath);
@@ -73,7 +73,7 @@ async function Main() {
         const extraArguments = Object.assign({});
         extraArguments.userDataDir = constants.DEFAULT_DATA_DIR;
         const browser = await puppeteer.launch({
-            executablePath: revisionInfo.executablePath,
+            executablePath: '/usr/bin/chromium',
             defaultViewport: null,
             headless: appconfig.appconfig.headless,
             userDataDir: path.join(process.cwd(), "ChromeSession"),
@@ -113,7 +113,7 @@ async function Main() {
             // When the settings file is edited multiple calls are sent to function. This will help
             // to prevent from getting corrupted settings data
             let timeout = 5000;
-            
+
             // Register a filesystem watcher
             fs.watch(constants.BOT_SETTINGS_FILE, (event, filename) => {
                 setTimeout(()=> {
@@ -144,7 +144,7 @@ async function Main() {
 
     async function checkLogin() {
         spinner.start("Page is loading");
-        //TODO: avoid using delay and make it in a way that it would react to the event. 
+        //TODO: avoid using delay and make it in a way that it would react to the event.
         await utils.delay(10000);
         //console.log("loaded");
         var output = await page.evaluate("localStorage['last-wid']");
@@ -160,7 +160,7 @@ async function Main() {
 
     //TODO: add logic to refresh QR.
     async function getAndShowQR() {
-        //TODO: avoid using delay and make it in a way that it would react to the event. 
+        //TODO: avoid using delay and make it in a way that it would react to the event.
         //await utils.delay(10000);
         var scanme = "img[alt='Scan me!'], canvas";
         await page.waitForSelector(scanme);
@@ -171,7 +171,7 @@ async function Main() {
         var isLoggedIn = await injectScripts(page);
         while (!isLoggedIn) {
             //console.log("page is loading");
-            //TODO: avoid using delay and make it in a way that it would react to the event. 
+            //TODO: avoid using delay and make it in a way that it would react to the event.
             await utils.delay(300);
             isLoggedIn = await injectScripts(page);
         }
@@ -201,7 +201,7 @@ async function Main() {
         page.waitForSelector("#main", { timeout: 0 }).then(async () => {
             await page.exposeFunction("sendMessage", async message => {
                 return new Promise(async (resolve, reject) => {
-                    //send message to the currently open chat using power of puppeteer 
+                    //send message to the currently open chat using power of puppeteer
                     await page.type("#main div.selectable-text[data-tab]", message);
                     if (configs.smartreply.clicktosend) {
                         await page.click("#main > footer > div.copyable-area > div:nth-child(3) > button");

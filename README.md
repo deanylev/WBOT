@@ -1,8 +1,8 @@
 
 
-# WBOT 
+# WBOT
 
- [![Support me on Patreon][badge_patreon]][patreon] [![Buy me a book][badge_amazon]][amazon] [![PayPal][badge_paypal]][paypal-donations] 
+ [![Support me on Patreon][badge_patreon]][patreon] [![Buy me a book][badge_amazon]][amazon] [![PayPal][badge_paypal]][paypal-donations]
 
 
 > A simple Nodejs BOT for whatsapp web
@@ -17,13 +17,13 @@
 <a href="#faq">FAQ</a>
 
 ## ✨Update 30th Mar 2021
-Started as small side project, WBOT has become essential tool for small business owners who runs their business on whatsapp. WBOT helps them simplify business transitions by saving time and resources. I am overwhelmed by the support I received from all people on my email and telegram. I will continue updating WBOT. 
+Started as small side project, WBOT has become essential tool for small business owners who runs their business on whatsapp. WBOT helps them simplify business transitions by saving time and resources. I am overwhelmed by the support I received from all people on my email and telegram. I will continue updating WBOT.
 
 Thank you 🙏
 
 
 
-## 🔍 Preview 
+## 🔍 Preview
 
 ### Quick preview
 ![Screenshot gif](https://user-images.githubusercontent.com/6497827/58411958-1dcc8000-8093-11e9-8aeb-5747efe10266.gif)
@@ -35,13 +35,13 @@ Thank you 🙏
 
 -->
 
-## ⚡ Features 
+## ⚡ Features
 
 * 🎨 Highly customizable json
 * 💯 Totally Free for personal use
 * 🔒 Complete Privacy. Your data stays with you always
 * 💻 Download media files automatically
-* 👥 Multiple instances 
+* 👥 Multiple instances
 
 ## ⬇ Downloads ⬇
 
@@ -71,8 +71,8 @@ Windows 7 and later are supported.
 
 After downloading, extract the zip file and navigate to that location in your terminal. There will be a file named wbot-* . Run it and you should be good to go.
 
-For Linux you need to provide executable permission before you execute the binary. 
-Run the command - 
+For Linux you need to provide executable permission before you execute the binary.
+Run the command -
 ```
 chmod +x wbot-linux && wbot-linux
 ```
@@ -82,37 +82,38 @@ If you run Linux on a headless server or wan't to run chmomium without visible d
 
 *I haven't tested Mac and Linux binaries. If you find any issues using them feel free to raise one from [here](https://github.com/vasani-arpit/WBOT/issues/new)*
 
-### Configurations 
+### Configurations
 
 Basic configuration is in bot.json file like replying to Hi, hello and happy birthday. You can add/remove yours if you need. Keep in mind that you need to restart the wbot to see the effects of your changes. Make sure the JSON is valid. Use VSCode or [jsonlint](https://jsonlint.com/) to validate the JSON.
 
-### bot.json 
+### bot.json
 
 **appconfig**
 
 This is where all the application related (node application behavior and such things) config will stay. Will add more in future.
 
+- **duplicado** whether to run in Duplicado Detector mode.
 - **headless** whether to start chrome as headless or not. this is regarding #4. Apparently, Whatsapp doesn't allow headless instances.
 - **isGroupReply** whether to send replies in group or not. If set to false, Bot will not reply if message received in group chat.
 
 - **webhook** A URL which will be called for every message with payload data. this can be useful if you want do other operation over messages in your server. for example server code take a look [here](https://github.com/vasani-arpit/WBOT/blob/master/docs/Webhook-example.md)
 
-- **downloadMedia** Whether to download incoming message media or not. 
+- **downloadMedia** Whether to download incoming message media or not.
 
-- **replyUnreadMsg** If there are pending unread messages which bot hasn't replied to then by making this flag true bot will respond to those messages. Keep in mind that bot will not be able to mark those messages as read/seen. Please open the chat manually in the phone to mark that chat as read other wise bot will reply to it at every start. 
+- **replyUnreadMsg** If there are pending unread messages which bot hasn't replied to then by making this flag true bot will respond to those messages. Keep in mind that bot will not be able to mark those messages as read/seen. Please open the chat manually in the phone to mark that chat as read other wise bot will reply to it at every start.
 
 **bot**
 
-An array of objects. Properties of Object are self explanatory. 
+An array of objects. Properties of Object are self explanatory.
 
 - **Contains** If message has one of that word anywhere in the message
 - **exact** If message is exactly as one of the messages form array
 
 - **Response** If any of the above conditions becomes true then corresponding response string or [spintax](https://spintaxtool.appspot.com/) will be sent as message to the user or group. there is two variables name and phoneNumber which you can use to create custom message for sender. sample message with variable is in `bot.json`
 
-- **file** name of the file (from current directory) which you want to send along with response 
+- **file** name of the file (from current directory) which you want to send along with response
 
-- **afterSeconds** number of seconds bot should wait before sending a reply. 
+- **afterSeconds** number of seconds bot should wait before sending a reply.
 
 **Blocked**
 
@@ -153,7 +154,7 @@ If you run Linux on a headless server or wan't to run chmomium without visible d
 ## Known bugs
 Sometimes, closing the `node` server directly does not clear browser cache. Next time when the bot is started, it runs into errors due to which smart reply is not setup correctly. A temporary fix to this is to clear `node` cache.
 
-```java-script 
+```java-script
 npm cache clean
 ```
 
@@ -190,9 +191,9 @@ If you think WBOT delivers these, let me know by putting a **star ⭐** on this 
 
 * **What npm modules did you use?**
 
-  - [Ora](https://www.npmjs.com/package/ora) for spinner 
+  - [Ora](https://www.npmjs.com/package/ora) for spinner
   - [cli-progress](https://www.npmjs.com/package/cli-progress) for download progress bar in terminal
-  - [qrcode-terminal](https://www.npmjs.com/package/qrcode-terminal) to generate QRCode in terminal 
+  - [qrcode-terminal](https://www.npmjs.com/package/qrcode-terminal) to generate QRCode in terminal
   - [mime](https://www.npmjs.com/package/mime) detect mime file sent
   - [mel-spintax](https://www.npmjs.com/package/mel-spintax) to support spintax
 
