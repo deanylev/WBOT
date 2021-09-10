@@ -90,7 +90,7 @@ async function processMessages(data) {
         //fetch API to send and receive response from server
         let message = data[i];
         const isReplyToMedia = message.quotedMsgObj && message.quotedMsgObj.fromMe && message.quotedMsgObj.isMedia || false;
-        if (intents.appconfig.duplicado && !isReplyToMedia && !message.body.startsWith('/duplicado ') && !(message.mimetype === 'image/jpeg' || message.mimetype === 'video/mp4' && !message.isGif)) {
+        if (intents.appconfig.duplicado && !isReplyToMedia && !message.body.startsWith('/duplicado ') && !message.body.startsWith('/d ') && !(message.mimetype === 'image/jpeg' || message.mimetype === 'video/mp4' && !message.isGif)) {
             continue;
         }
         const { groupMetadata } = message.chat;
